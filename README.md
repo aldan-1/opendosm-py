@@ -90,10 +90,13 @@ data = client.opendosm.get("cpi_core", query=query)
 | `.range(col, begin, end)` | Numerical range | `.range("value", 10, 100)` |
 | `.sort(*cols, descending)` | Sort results | `.sort("date", descending=True)` |
 | `.date_range(col, start, end)` | Date filter (YYYY-MM-DD) | `.date_range("date", start="2023-01-01")` |
+| `.timestamp_range(col, start, end)` | Timestamp filter (YYYY-MM-DD HH:MM:SS) | `.timestamp_range("ts", start="2023-01-01 00:00:00")` |
 | `.limit(n)` | Max records | `.limit(100)` |
 | `.include(*cols)` | Include columns only | `.include("date", "value")` |
 | `.exclude(*cols)` | Exclude columns | `.exclude("id")` |
 | `.with_meta()` | Include metadata | `.with_meta()` |
+
+> **Note:** When both `.include()` and `.exclude()` are used, `include` takes precedence.
 
 ## Pandas Integration
 

@@ -54,6 +54,7 @@ class HTTPClient:
             base_url=self.base_url,
             headers=headers,
             timeout=timeout,
+            follow_redirects=True,
         )
 
     # ── Public API ─────────────────────────────────────────────────────
