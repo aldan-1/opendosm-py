@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Union
+import contextlib
+from typing import Any
 
 from opendosm.models import APIResponse
 
@@ -30,7 +31,7 @@ def to_dataframe(data: object) -> Any:
             "Install it with: pip install opendosm[pandas]"
         ) from None
 
-    records: Union[List[Dict[str, Any]], Any]
+    records: list[dict[str, Any]] | Any
 
     if isinstance(data, APIResponse):
         records = data.data
@@ -58,7 +59,5 @@ def _infer_dates(df: Any) -> None:
     for col in df.columns:
         col_lower = str(col).lower()
         if any(hint in col_lower for hint in date_hints):
-            try:
+            with contextlib.suppress(Exception):
                 df[col] = pd.to_datetime(df[col], errors="coerce")
-            except Exception:
-                pass

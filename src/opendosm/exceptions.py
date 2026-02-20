@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Optional
+from typing import Any
 
 
 class OpenDOSMError(Exception):
@@ -25,7 +25,7 @@ class APIError(OpenDOSMError):
         self,
         message: str,
         status_code: int,
-        errors: Optional[List[Any]] = None,
+        errors: list[Any] | None = None,
     ) -> None:
         self.status_code = status_code
         self.errors = errors or []
@@ -48,8 +48,8 @@ class RateLimitError(APIError):
 
     def __init__(
         self,
-        retry_after: Optional[float] = None,
-        errors: Optional[List[Any]] = None,
+        retry_after: float | None = None,
+        errors: list[Any] | None = None,
     ) -> None:
         self.retry_after = retry_after
         super().__init__(
@@ -62,7 +62,7 @@ class RateLimitError(APIError):
 class AuthenticationError(APIError):
     """Raised when authentication fails (HTTP 401 or 403)."""
 
-    def __init__(self, errors: Optional[List[Any]] = None) -> None:
+    def __init__(self, errors: list[Any] | None = None) -> None:
         super().__init__(
             message="Authentication failed. Check your API token.",
             status_code=401,
@@ -73,7 +73,7 @@ class AuthenticationError(APIError):
 class NotFoundError(APIError):
     """Raised when the requested resource is not found (HTTP 404)."""
 
-    def __init__(self, resource: str = "", errors: Optional[List[Any]] = None) -> None:
+    def __init__(self, resource: str = "", errors: list[Any] | None = None) -> None:
         msg = f"Resource not found: '{resource}'" if resource else "Resource not found"
         super().__init__(message=msg, status_code=404, errors=errors)
 

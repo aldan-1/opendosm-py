@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, cast
 
-from opendosm.http import HTTPClient
 from opendosm.models import APIResponse
-from opendosm.query import QueryBuilder
+
+if TYPE_CHECKING:
+    from opendosm.http import HTTPClient
+    from opendosm.query import QueryBuilder
 
 
 class BaseAPI:
@@ -24,11 +26,11 @@ class BaseAPI:
     def _get(
         self,
         dataset_id: str,
-        query: Optional[QueryBuilder] = None,
+        query: QueryBuilder | None = None,
         *,
         meta: bool = False,
         **extra_params: str,
-    ) -> Union[List[Dict[str, Any]], APIResponse]:
+    ) -> list[dict[str, Any]] | APIResponse:
         """Fetch data for a given dataset.
 
         Args:
@@ -40,7 +42,7 @@ class BaseAPI:
         Returns:
             A list of record dicts (default), or an ``APIResponse`` if ``meta=True``.
         """
-        params: Dict[str, str] = {"id": dataset_id}
+        params: dict[str, str] = {"id": dataset_id}
 
         if query is not None:
             params.update(query.build())
@@ -55,4 +57,4 @@ class BaseAPI:
         if meta and isinstance(raw, dict):
             return APIResponse.model_validate(raw)
 
-        return raw  # type: ignore[return-value]
+        return cast("list[dict[str, Any]]", raw)

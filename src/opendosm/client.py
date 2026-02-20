@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from opendosm.api.data_catalogue import DataCatalogueAPI
 from opendosm.api.opendosm import OpenDOSMAPI
 from opendosm.http import HTTPClient
@@ -49,7 +47,7 @@ class OpenDOSM:
 
     def __init__(
         self,
-        token: Optional[str] = None,
+        token: str | None = None,
         base_url: str = "https://api.data.gov.my",
         timeout: float = 30.0,
     ) -> None:

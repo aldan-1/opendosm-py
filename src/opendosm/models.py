@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -24,8 +24,8 @@ class APIResponse(BaseModel):
         data: The list of data records.
     """
 
-    meta: Optional[MetaInfo] = None
-    data: List[Dict[str, Any]] = Field(default_factory=list)
+    meta: MetaInfo | None = None
+    data: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class ErrorDetail(BaseModel):
@@ -45,4 +45,4 @@ class ErrorResponse(BaseModel):
     """
 
     status: int
-    errors: List[Any] = Field(default_factory=list)
+    errors: list[Any] = Field(default_factory=list)

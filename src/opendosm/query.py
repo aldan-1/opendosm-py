@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Sequence, Union
+from typing import TYPE_CHECKING
 
 from opendosm.exceptions import InvalidQueryError
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class QueryBuilder:
@@ -22,7 +25,7 @@ class QueryBuilder:
     """
 
     def __init__(self) -> None:
-        self._params: Dict[str, str] = {}
+        self._params: dict[str, str] = {}
 
     # ── Row-level filters ──────────────────────────────────────────────
 
@@ -50,8 +53,8 @@ class QueryBuilder:
         self._params["icontains"] = ",".join(parts)
         return self
 
-    def range(self, column: str, begin: Optional[Union[int, float]] = None,
-              end: Optional[Union[int, float]] = None) -> QueryBuilder:
+    def range(self, column: str, begin: int | float | None = None,
+              end: int | float | None = None) -> QueryBuilder:
         """Numerical range filter.  ``?range=<column>[<begin>:<end>]``"""
         begin_str = str(begin) if begin is not None else ""
         end_str = str(end) if end is not None else ""
@@ -60,7 +63,7 @@ class QueryBuilder:
 
     # ── Sorting ────────────────────────────────────────────────────────
 
-    def sort(self, *columns: str, descending: Union[bool, Sequence[bool]] = False) -> QueryBuilder:
+    def sort(self, *columns: str, descending: bool | Sequence[bool] = False) -> QueryBuilder:
         """Sort by one or more columns.
 
         Args:
@@ -77,7 +80,7 @@ class QueryBuilder:
                     f"descending has {len(flags)} values but {len(columns)} columns given"
                 )
 
-        parts: List[str] = []
+        parts: list[str] = []
         for col, desc in zip(columns, flags):
             parts.append(f"-{col}" if desc else col)
         self._params["sort"] = ",".join(parts)
@@ -88,8 +91,8 @@ class QueryBuilder:
     def date_range(
         self,
         column: str,
-        start: Optional[str] = None,
-        end: Optional[str] = None,
+        start: str | None = None,
+        end: str | None = None,
     ) -> QueryBuilder:
         """Filter by date range (``YYYY-MM-DD``).
 
@@ -107,8 +110,8 @@ class QueryBuilder:
     def timestamp_range(
         self,
         column: str,
-        start: Optional[str] = None,
-        end: Optional[str] = None,
+        start: str | None = None,
+        end: str | None = None,
     ) -> QueryBuilder:
         """Filter by timestamp range (``YYYY-MM-DD HH:MM:SS``).
 
@@ -156,7 +159,7 @@ class QueryBuilder:
 
     # ── Build ──────────────────────────────────────────────────────────
 
-    def build(self) -> Dict[str, str]:
+    def build(self) -> dict[str, str]:
         """Return the accumulated query parameters as a dict."""
         return dict(self._params)
 

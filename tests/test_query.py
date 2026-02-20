@@ -2,8 +2,8 @@
 
 import pytest
 
-from opendosm.query import QueryBuilder
 from opendosm.exceptions import InvalidQueryError
+from opendosm.query import QueryBuilder
 
 
 class TestFilter:

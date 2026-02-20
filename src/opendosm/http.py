@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 
 import httpx
 
@@ -36,14 +36,14 @@ class HTTPClient:
     def __init__(
         self,
         base_url: str = _DEFAULT_BASE_URL,
-        token: Optional[str] = None,
+        token: str | None = None,
         timeout: float = _DEFAULT_TIMEOUT,
         max_retries: int = _MAX_RETRIES,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.max_retries = max_retries
 
-        headers: Dict[str, str] = {
+        headers: dict[str, str] = {
             "Accept": "application/json",
             "User-Agent": "opendosm-py/0.1.0",
         }
@@ -58,7 +58,7 @@ class HTTPClient:
 
     # ── Public API ─────────────────────────────────────────────────────
 
-    def get(self, path: str, params: Optional[Dict[str, str]] = None) -> Any:
+    def get(self, path: str, params: dict[str, str] | None = None) -> Any:
         """Send a GET request and return the parsed JSON response.
 
         Automatically retries on HTTP 429 with exponential backoff.
@@ -108,7 +108,7 @@ class HTTPClient:
     # ── Internals ──────────────────────────────────────────────────────
 
     @staticmethod
-    def _parse_retry_after(response: httpx.Response) -> Optional[float]:
+    def _parse_retry_after(response: httpx.Response) -> float | None:
         raw = response.headers.get("Retry-After")
         if raw is not None:
             try:

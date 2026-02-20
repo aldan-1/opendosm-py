@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from opendosm.api.base import BaseAPI
-from opendosm.http import HTTPClient
-from opendosm.models import APIResponse
-from opendosm.query import QueryBuilder
+
+if TYPE_CHECKING:
+    from opendosm.http import HTTPClient
+    from opendosm.models import APIResponse
+    from opendosm.query import QueryBuilder
 
 
 class DataCatalogueAPI(BaseAPI):
@@ -30,11 +32,11 @@ class DataCatalogueAPI(BaseAPI):
     def get(
         self,
         dataset_id: str,
-        query: Optional[QueryBuilder] = None,
+        query: QueryBuilder | None = None,
         *,
         meta: bool = False,
         **extra_params: str,
-    ) -> Union[List[Dict[str, Any]], APIResponse]:
+    ) -> list[dict[str, Any]] | APIResponse:
         """Fetch any Data Catalogue dataset by its ID.
 
         Args:
