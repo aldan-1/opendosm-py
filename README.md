@@ -190,4 +190,4 @@ MIT — see [LICENSE](LICENSE).
 
 - **API Docs**: [developer.data.gov.my](https://developer.data.gov.my/)
 - **OpenDOSM Portal**: [open.dosm.gov.my](https://open.dosm.gov.my/)
-- **Dataset Catalogue**: [open.dosm.gov.my/data-catalogue](https://open.dosm.gov.my/data-catalogue)
+- **Dataset Catalogue**: [data.gov.my/data-catalogue](https://data.gov.my/data-catalogue)
