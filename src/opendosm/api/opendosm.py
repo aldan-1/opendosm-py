@@ -74,7 +74,7 @@ class OpenDOSMAPI(BaseAPI):
 
     def gdp(
         self,
-        dataset_id: str = "gdp",
+        dataset_id: str = "gdp_qtr_real",
         query: QueryBuilder | None = None,
         *,
         meta: bool = False,
@@ -83,7 +83,8 @@ class OpenDOSMAPI(BaseAPI):
         """Fetch Gross Domestic Product data.
 
         Args:
-            dataset_id: GDP dataset variant (default ``"gdp"``).
+            dataset_id: GDP dataset variant (default ``"gdp_qtr_real"``).
+                Other variants: ``"gdp_qtr_nominal"``.
             query: Optional filters.
             meta: If ``True``, returns an ``APIResponse`` with metadata.
         """
@@ -108,7 +109,7 @@ class OpenDOSMAPI(BaseAPI):
 
     def trade(
         self,
-        dataset_id: str = "trade",
+        dataset_id: str = "trade_sitc_1d",
         query: QueryBuilder | None = None,
         *,
         meta: bool = False,
@@ -117,7 +118,7 @@ class OpenDOSMAPI(BaseAPI):
         """Fetch external trade data.
 
         Args:
-            dataset_id: Trade dataset variant (default ``"trade"``).
+            dataset_id: Trade dataset variant (default ``"trade_sitc_1d"``).
             query: Optional filters.
             meta: If ``True``, returns an ``APIResponse`` with metadata.
         """
