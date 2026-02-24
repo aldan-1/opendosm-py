@@ -2,8 +2,8 @@
 
 import pytest
 
-from opendosm.query import QueryBuilder
 from opendosm.exceptions import InvalidQueryError
+from opendosm.query import QueryBuilder
 
 
 class TestFilter:
@@ -120,6 +120,32 @@ class TestMeta:
     def test_with_meta_false(self):
         q = QueryBuilder().with_meta(True).with_meta(False)
         assert "meta" not in q.build()
+
+
+class TestEdgeCases:
+    def test_empty_build(self):
+        q = QueryBuilder()
+        assert q.build() == {}
+
+    def test_date_range_end_only(self):
+        q = QueryBuilder().date_range("date", end="2023-12-31")
+        params = q.build()
+        assert "date_start" not in params
+        assert params["date_end"] == "2023-12-31@date"
+
+    def test_include_and_exclude_together(self):
+        q = QueryBuilder().include("date", "value").exclude("id")
+        params = q.build()
+        assert "include" in params
+        assert "exclude" in params
+
+    def test_limit_zero(self):
+        q = QueryBuilder().limit(0)
+        assert q.build() == {"limit": "0"}
+
+    def test_repr(self):
+        q = QueryBuilder().limit(5)
+        assert "limit" in repr(q)
 
 
 class TestChaining:

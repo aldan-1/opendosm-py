@@ -10,6 +10,7 @@ A Pythonic SDK for Malaysia's **[data.gov.my Open API](https://developer.data.go
 ## Features
 
 - 🔍 **Fluent QueryBuilder** — filter, sort, paginate, and select columns with a chainable API
+- 🗂️ **Dataset discovery** — `list_datasets()` and `search()` to find any of the 280+ available datasets
 - 📊 **Pandas integration** — `.to_dataframe()` with automatic date parsing
 - ⚡ **Smart retries** — automatic exponential backoff on rate limits (429)
 - 🔐 **Token auth** — optional API token for higher rate limits
@@ -39,7 +40,7 @@ cpi_data = client.opendosm.cpi()
 population = client.opendosm.population()
 
 # Fetch any dataset by ID
-data = client.opendosm.get("gdp")
+data = client.opendosm.get("gdp_qtr_real")
 
 # Don't forget to close
 client.close()
@@ -90,10 +91,13 @@ data = client.opendosm.get("cpi_core", query=query)
 | `.range(col, begin, end)` | Numerical range | `.range("value", 10, 100)` |
 | `.sort(*cols, descending)` | Sort results | `.sort("date", descending=True)` |
 | `.date_range(col, start, end)` | Date filter (YYYY-MM-DD) | `.date_range("date", start="2023-01-01")` |
+| `.timestamp_range(col, start, end)` | Timestamp filter (YYYY-MM-DD HH:MM:SS) | `.timestamp_range("ts", start="2023-01-01 00:00:00")` |
 | `.limit(n)` | Max records | `.limit(100)` |
 | `.include(*cols)` | Include columns only | `.include("date", "value")` |
 | `.exclude(*cols)` | Exclude columns | `.exclude("id")` |
 | `.with_meta()` | Include metadata | `.with_meta()` |
+
+> **Note:** When both `.include()` and `.exclude()` are used, `include` takes precedence.
 
 ## Pandas Integration
 
@@ -115,21 +119,34 @@ print(df.dtypes)  # Date columns auto-parsed!
 The SDK provides shortcuts for popular datasets:
 
 ```python
-client.opendosm.cpi()          # Consumer Price Index
-client.opendosm.gdp()          # Gross Domestic Product
-client.opendosm.population()   # Population by State
-client.opendosm.trade()        # External Trade
-client.opendosm.labour()       # Labour Force Survey
+client.opendosm.cpi()          # Consumer Price Index (default: "cpi_core")
+client.opendosm.gdp()          # Gross Domestic Product (default: "gdp_qtr_real")
+client.opendosm.population()   # Population by State (default: "population_state")
+client.opendosm.trade()        # External Trade (default: "trade_sitc_1d")
+client.opendosm.labour()       # Labour Force Survey (default: "lfs_month")
 ```
 
 All accept an optional `query` parameter and custom `dataset_id`.
 
 ## Data Catalogue API
 
-Access the broader data.gov.my catalogue:
+Access the broader data.gov.my catalogue (280+ datasets):
 
 ```python
-data = client.data_catalogue.get("some_dataset_id")
+# Fetch a specific dataset
+data = client.data_catalogue.get("fuelprice")
+
+# Discover available datasets (live from API, always up to date)
+all_datasets = client.data_catalogue.list_datasets()
+
+# Filter by category or source
+demo = client.data_catalogue.list_datasets(category="Demography")
+dosm = client.data_catalogue.list_datasets(source="DOSM")
+
+# Search by keyword across IDs and titles
+gdp_datasets = client.data_catalogue.search("gdp")
+for ds in gdp_datasets:
+    print(f"{ds.id}: {ds.title_en}")
 ```
 
 ## Error Handling
@@ -173,4 +190,4 @@ MIT — see [LICENSE](LICENSE).
 
 - **API Docs**: [developer.data.gov.my](https://developer.data.gov.my/)
 - **OpenDOSM Portal**: [open.dosm.gov.my](https://open.dosm.gov.my/)
-- **Dataset Catalogue**: [open.dosm.gov.my/data-catalogue](https://open.dosm.gov.my/data-catalogue)
+- **Dataset Catalogue**: [data.gov.my/data-catalogue](https://data.gov.my/data-catalogue)

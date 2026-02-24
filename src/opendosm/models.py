@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -24,8 +24,33 @@ class APIResponse(BaseModel):
         data: The list of data records.
     """
 
-    meta: Optional[MetaInfo] = None
-    data: List[Dict[str, Any]] = Field(default_factory=list)
+    meta: MetaInfo | None = None
+    data: list[dict[str, Any]] = Field(default_factory=list)
+
+
+
+class DatasetInfo(BaseModel):
+    """Metadata for a single dataset in the data catalogue.
+
+    Returned by :meth:`DataCatalogueAPI.list_datasets`.
+    """
+
+    id: str
+    title_en: str = ""
+    title_bm: str = ""
+    category_en: str = ""
+    category_bm: str = ""
+    subcategory_en: str = ""
+    subcategory_bm: str = ""
+    source: str = ""
+    frequency: str = ""
+    geography: str = ""
+    demography: str = ""
+    dataset_begin: str = ""
+    dataset_end: str = ""
+    date_created: str = ""
+
+    model_config = {"extra": "allow"}
 
 
 class ErrorDetail(BaseModel):
@@ -45,4 +70,4 @@ class ErrorResponse(BaseModel):
     """
 
     status: int
-    errors: List[Any] = Field(default_factory=list)
+    errors: list[Any] = Field(default_factory=list)

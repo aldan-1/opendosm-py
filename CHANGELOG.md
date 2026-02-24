@@ -15,3 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pydantic response models with validation
 - Automatic retry on rate-limit (429) responses
 - Optional Pandas DataFrame integration (`pip install opendosm[pandas]`)
+- Dataset discovery via `list_datasets()` and `search()` methods
+- `DatasetInfo` model for structured dataset metadata
+- Pandas support for `list[DatasetInfo]` conversion and numeric coercion
+- Convenience methods: `cpi()`, `gdp()`, `population()`, `trade()`, `labour()`
+- 104 unit tests with full mocked coverage

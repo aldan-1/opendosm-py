@@ -86,6 +86,53 @@ class TestRateLimiting:
         client.close()
 
 
+class TestRetryAfterHeader:
+    def test_retry_after_header_respected(self, httpx_mock):
+        """429 with Retry-After header should use that value."""
+        httpx_mock.add_response(
+            status_code=429,
+            headers={"Retry-After": "0.01"},
+            json={"status": 429, "errors": []},
+        )
+        httpx_mock.add_response(json=[{"value": 1}])
+
+        client = HTTPClient(max_retries=1)
+        result = client.get("/opendosm")
+        assert result == [{"value": 1}]
+        client.close()
+
+    def test_invalid_retry_after_falls_back(self, httpx_mock):
+        """Invalid Retry-After header falls back to exponential backoff."""
+        httpx_mock.add_response(
+            status_code=429,
+            headers={"Retry-After": "not-a-number"},
+            json={"status": 429, "errors": []},
+        )
+        httpx_mock.add_response(json=[{"value": 2}])
+
+        client = HTTPClient(max_retries=1)
+        result = client.get("/opendosm")
+        assert result == [{"value": 2}]
+        client.close()
+
+
+class TestNonJsonError:
+    def test_non_json_error_body(self, httpx_mock):
+        """HTML error body should not crash the error parser."""
+        httpx_mock.add_response(
+            status_code=502,
+            text="<html><body>Bad Gateway</body></html>",
+            headers={"Content-Type": "text/html"},
+        )
+        with pytest.raises(APIError) as exc_info:
+            client = HTTPClient()
+            try:
+                client.get("/opendosm")
+            finally:
+                client.close()
+        assert exc_info.value.status_code == 502
+
+
 class TestContextManager:
     def test_context_manager(self, httpx_mock):
         httpx_mock.add_response(json=[])
