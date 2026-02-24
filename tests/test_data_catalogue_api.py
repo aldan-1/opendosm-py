@@ -182,3 +182,20 @@ class TestSearch:
         result = api.search("zzzznonexistent")
 
         assert result == []
+
+
+class TestEdgeCases:
+    def test_get_with_meta(self, httpx_mock, api):
+        httpx_mock.add_response(json={"meta": {"total": 1}, "data": [{"ron95": 2.05}]})
+        from opendosm.models import APIResponse
+
+        result = api.get("fuelprice", meta=True)
+        assert isinstance(result, APIResponse)
+        assert len(result.data) == 1
+
+    def test_list_datasets_non_list_response(self, httpx_mock, api):
+        """If the API returns a dict instead of a list, return empty."""
+        httpx_mock.add_response(json={"error": "unexpected"})
+        result = api.list_datasets()
+        assert result == []
+
