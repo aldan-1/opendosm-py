@@ -28,6 +28,31 @@ class APIResponse(BaseModel):
     data: list[dict[str, Any]] = Field(default_factory=list)
 
 
+
+class DatasetInfo(BaseModel):
+    """Metadata for a single dataset in the data catalogue.
+
+    Returned by :meth:`DataCatalogueAPI.list_datasets`.
+    """
+
+    id: str
+    title_en: str = ""
+    title_bm: str = ""
+    category_en: str = ""
+    category_bm: str = ""
+    subcategory_en: str = ""
+    subcategory_bm: str = ""
+    source: str = ""
+    frequency: str = ""
+    geography: str = ""
+    demography: str = ""
+    dataset_begin: str = ""
+    dataset_end: str = ""
+    date_created: str = ""
+
+    model_config = {"extra": "allow"}
+
+
 class ErrorDetail(BaseModel):
     """A single error detail from the API."""
 

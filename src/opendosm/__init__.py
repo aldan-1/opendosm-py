@@ -20,7 +20,7 @@ from opendosm.exceptions import (
     OpenDOSMError,
     RateLimitError,
 )
-from opendosm.models import APIResponse, MetaInfo
+from opendosm.models import APIResponse, DatasetInfo, MetaInfo
 from opendosm.query import QueryBuilder
 
 __version__ = "0.1.0"
@@ -29,6 +29,7 @@ __all__ = [
     "OpenDOSM",
     "QueryBuilder",
     "APIResponse",
+    "DatasetInfo",
     "MetaInfo",
     "OpenDOSMError",
     "APIError",

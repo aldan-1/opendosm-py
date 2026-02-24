@@ -54,7 +54,7 @@ class TestConvenienceMethods:
         httpx_mock.add_response(json=[{"value": 200}])
         api.gdp()
         request = httpx_mock.get_request()
-        assert "id=gdp" in str(request.url)
+        assert "id=gdp_qtr_real" in str(request.url)
 
     def test_population(self, httpx_mock, api):
         httpx_mock.add_response(json=[{"value": 300}])
@@ -66,7 +66,7 @@ class TestConvenienceMethods:
         httpx_mock.add_response(json=[{"value": 400}])
         api.trade()
         request = httpx_mock.get_request()
-        assert "id=trade" in str(request.url)
+        assert "id=trade_sitc_1d" in str(request.url)
 
     def test_labour(self, httpx_mock, api):
         httpx_mock.add_response(json=[{"value": 500}])

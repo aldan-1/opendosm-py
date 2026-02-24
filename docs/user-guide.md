@@ -16,6 +16,7 @@ A comprehensive guide to using the `opendosm` Python SDK for accessing Malaysia'
 - [Fetching Data](#fetching-data)
   - [OpenDOSM API](#opendosm-api)
   - [Data Catalogue API](#data-catalogue-api)
+  - [Dataset Discovery](#dataset-discovery)
   - [Finding Dataset IDs](#finding-dataset-ids)
 - [Query Builder](#query-builder)
   - [Exact Match Filters](#exact-match-filters)
@@ -44,6 +45,7 @@ A comprehensive guide to using the `opendosm` Python SDK for accessing Malaysia'
   - [CPI Analysis](#example-cpi-analysis)
   - [Fuel Price Tracker](#example-fuel-price-tracker)
   - [Population Dashboard Data](#example-population-dashboard-data)
+  - [Dataset Discovery](#example-dataset-discovery)
 
 ---
 
@@ -166,7 +168,7 @@ Fetch any OpenDOSM dataset by its ID:
 
 ```python
 data = client.opendosm.get("cpi_core")
-data = client.opendosm.get("gdp")
+data = client.opendosm.get("gdp_qtr_real")
 data = client.opendosm.get("population_state")
 ```
 
@@ -176,9 +178,9 @@ Shortcuts for popular datasets:
 
 ```python
 client.opendosm.cpi()          # Consumer Price Index (default: "cpi_core")
-client.opendosm.gdp()          # Gross Domestic Product (default: "gdp")
+client.opendosm.gdp()          # Gross Domestic Product (default: "gdp_qtr_real")
 client.opendosm.population()   # Population by State (default: "population_state")
-client.opendosm.trade()        # External Trade (default: "trade")
+client.opendosm.trade()        # External Trade (default: "trade_sitc_1d")
 client.opendosm.labour()       # Labour Force Survey (default: "lfs_month")
 ```
 
@@ -200,20 +202,62 @@ data = client.opendosm.cpi(query=q, meta=True)
 
 ### Data Catalogue API
 
-Access the broader data.gov.my catalogue:
+Access the broader data.gov.my catalogue (280+ datasets):
 
 ```python
 fuel = client.data_catalogue.get("fuelprice")
 ```
 
+### Dataset Discovery
+
+The SDK can dynamically discover all available datasets directly from the API — no hardcoded lists, always up to date:
+
+```python
+from opendosm import OpenDOSM
+
+with OpenDOSM() as client:
+    # List all 280+ datasets
+    all_datasets = client.data_catalogue.list_datasets()
+    print(f"{len(all_datasets)} datasets available")
+
+    # Filter by category
+    demo = client.data_catalogue.list_datasets(category="Demography")
+    for ds in demo:
+        print(f"  {ds.id}: {ds.title_en}")
+
+    # Filter by source
+    bnm = client.data_catalogue.list_datasets(source="BNM")
+
+    # Search by keyword (matches id and title_en)
+    results = client.data_catalogue.search("gdp")
+    for ds in results:
+        print(f"  {ds.id}: {ds.title_en} ({ds.frequency})")
+```
+
+Each result is a `DatasetInfo` object with these fields:
+
+| Field | Description | Example |
+|---|---|---|
+| `id` | Dataset identifier for API calls | `"fuelprice"` |
+| `title_en` | English title | `"Price of Petroleum & Diesel"` |
+| `title_bm` | Malay title | `"Harga Minyak"` |
+| `category_en` | Category | `"Prices"` |
+| `subcategory_en` | Subcategory | `"Consumer Prices"` |
+| `source` | Data source agency | `"KPDN, DOSM"` |
+| `frequency` | Update frequency | `"WEEKLY"` |
+| `geography` | Geographic scope | `"NATIONAL"` |
+| `dataset_begin` | Earliest data year | `"2017"` |
+| `dataset_end` | Latest data year | `"2025"` |
+
 ### Finding Dataset IDs
 
-Dataset IDs are found on the OpenDOSM and data.gov.my portals:
+There are three ways to find dataset IDs:
 
-1. **OpenDOSM datasets**: Visit [open.dosm.gov.my/data-catalogue](https://open.dosm.gov.my/data-catalogue)
-2. **Data Catalogue datasets**: Visit [data.gov.my/data-catalogue](https://data.gov.my/data-catalogue)
+1. **Use the SDK** (recommended): `client.data_catalogue.search("keyword")`
+2. **OpenDOSM portal**: [open.dosm.gov.my/data-catalogue](https://open.dosm.gov.my/data-catalogue)
+3. **data.gov.my**: [data.gov.my/data-catalogue](https://data.gov.my/data-catalogue)
 
-On each dataset page, scroll to **"Sample OpenAPI query"** at the bottom to find the `id` value.
+On each web portal page, scroll to **"Sample OpenAPI query"** at the bottom to find the `id` value.
 
 ---
 
@@ -619,9 +663,9 @@ logging.getLogger("opendosm").setLevel(logging.WARNING)
 |---|---|
 | `.get(dataset_id, query=None, *, meta=False)` | Fetch any dataset by ID |
 | `.cpi(dataset_id="cpi_core", ...)` | Consumer Price Index |
-| `.gdp(dataset_id="gdp", ...)` | Gross Domestic Product |
+| `.gdp(dataset_id="gdp_qtr_real", ...)` | Gross Domestic Product |
 | `.population(dataset_id="population_state", ...)` | Population by State |
-| `.trade(dataset_id="trade", ...)` | External Trade |
+| `.trade(dataset_id="trade_sitc_1d", ...)` | External Trade |
 | `.labour(dataset_id="lfs_month", ...)` | Labour Force Survey |
 
 ### `DataCatalogueAPI` (via `client.data_catalogue`)
@@ -629,6 +673,8 @@ logging.getLogger("opendosm").setLevel(logging.WARNING)
 | Method | Description |
 |---|---|
 | `.get(dataset_id, query=None, *, meta=False)` | Fetch any Data Catalogue dataset |
+| `.list_datasets(*, category=None, source=None)` | List all datasets, optionally filtered |
+| `.search(query)` | Search datasets by keyword (id/title) |
 
 ### `QueryBuilder`
 
@@ -653,6 +699,7 @@ logging.getLogger("opendosm").setLevel(logging.WARNING)
 | Model | Fields | Description |
 |---|---|---|
 | `APIResponse` | `.meta`, `.data` | Structured response from `meta=True` |
+| `DatasetInfo` | `.id`, `.title_en`, `.category_en`, ... | Dataset metadata from `list_datasets()` |
 | `MetaInfo` | *(dynamic)* | Metadata about the dataset |
 | `ErrorResponse` | `.status`, `.errors` | Error structure from the API |
 
@@ -738,12 +785,39 @@ with OpenDOSM() as client:
     print(df[["date", "state", "population"]].to_string(index=False))
 ```
 
+### Example: Dataset Discovery
+
+```python
+from opendosm import OpenDOSM
+
+with OpenDOSM() as client:
+    # What categories are available?
+    all_ds = client.data_catalogue.list_datasets()
+    categories = sorted(set(ds.category_en for ds in all_ds))
+    print("Available categories:")
+    for cat in categories:
+        count = sum(1 for ds in all_ds if ds.category_en == cat)
+        print(f"  {cat} ({count} datasets)")
+
+    # Find all GDP-related datasets
+    gdp = client.data_catalogue.search("gdp")
+    print(f"\n{len(gdp)} GDP datasets:")
+    for ds in gdp:
+        print(f"  {ds.id}: {ds.title_en}")
+
+    # Get data from a discovered dataset
+    data = client.data_catalogue.get(gdp[0].id, limit=5)
+    print(f"\nFirst 5 records from {gdp[0].id}:")
+    for row in data:
+        print(f"  {row}")
+```
+
 ---
 
 ## Resources
 
 - **API Documentation**: [developer.data.gov.my](https://developer.data.gov.my/)
 - **OpenDOSM Portal**: [open.dosm.gov.my](https://open.dosm.gov.my/)
-- **Dataset Catalogue**: [open.dosm.gov.my/data-catalogue](https://open.dosm.gov.my/data-catalogue)
+- **Dataset Catalogue**: [data.gov.my/data-catalogue](https://data.gov.my/data-catalogue)
 - **Source Code**: [github.com/aldan-1/opendosm-py](https://github.com/aldan-1/opendosm-py)
 - **Report Issues**: [github.com/aldan-1/opendosm-py/issues](https://github.com/aldan-1/opendosm-py/issues)

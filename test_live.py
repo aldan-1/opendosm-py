@@ -1,118 +1,81 @@
-"""Live API tests 1-10 for the OpenDOSM SDK."""
+"""Test the 'datasets' meta-dataset for dynamic discovery.
+Validate the approach before implementing list_datasets() and search()."""
 
 from opendosm import OpenDOSM
-from opendosm.query import QueryBuilder
-from opendosm.exceptions import NotFoundError
-from opendosm.models import APIResponse
 
 client = OpenDOSM()
 
-# ── Test 1: Basic fetch ────────────────────────────────────────────
-print("=== TEST 1: Basic Fetch ===")
-data = client.opendosm.get("cpi_core", limit=5)
-print(f"Got {len(data)} records")
-print(f"First record: {data[0]}")
+# ── 1. Fetch all datasets ──────────────────────────────────────────
+print("=== 1. Fetch All Datasets ===")
+all_ds = client.data_catalogue.get("datasets")
+print(f"Total datasets: {len(all_ds)}")
+print(f"Record keys: {list(all_ds[0].keys())}")
 print()
 
-# ── Test 2: Convenience methods ────────────────────────────────────
-print("=== TEST 2: Convenience Methods ===")
-cpi = client.opendosm.cpi(limit=3)
-print(f"CPI:        {len(cpi)} records  -> keys: {list(cpi[0].keys())}")
-
-gdp = client.opendosm.gdp(limit=3)
-print(f"GDP:        {len(gdp)} records  -> keys: {list(gdp[0].keys())}")
-
-pop = client.opendosm.population(limit=3)
-print(f"Population: {len(pop)} records  -> keys: {list(pop[0].keys())}")
-
-trade = client.opendosm.trade(limit=3)
-print(f"Trade:      {len(trade)} records  -> keys: {list(trade[0].keys())}")
-
-labour = client.opendosm.labour(limit=3)
-print(f"Labour:     {len(labour)} records  -> keys: {list(labour[0].keys())}")
+# ── 2. List all categories ─────────────────────────────────────────
+print("=== 2. Available Categories ===")
+categories = sorted(set(d["category_en"] for d in all_ds))
+for cat in categories:
+    count = sum(1 for d in all_ds if d["category_en"] == cat)
+    print(f"  {cat:30s} ({count} datasets)")
 print()
 
-# ── Test 3: Filtering by state ─────────────────────────────────────
-print("=== TEST 3: QueryBuilder - Filtering ===")
-q = QueryBuilder().filter(state="Selangor").limit(10)
-data = client.opendosm.population(query=q)
-print(f"Selangor records: {len(data)}")
-for r in data[:3]:
-    print(f"  state={r.get('state')}, date={r.get('date')}, pop={r.get('population')}")
+# ── 3. Filter by category ──────────────────────────────────────────
+print("=== 3. Filter by Category (Demography) ===")
+demo = [d for d in all_ds if d["category_en"] == "Demography"]
+for d in demo[:5]:
+    print(f"  {d['id']:40s} {d['title_en']}")
+if len(demo) > 5:
+    print(f"  ... and {len(demo) - 5} more")
 print()
 
-# ── Test 4: Sorting + column selection ─────────────────────────────
-print("=== TEST 4: QueryBuilder - Sort + Include ===")
-q = QueryBuilder().sort("date", descending=True).limit(5).include("date", "index")
-data = client.opendosm.cpi(query=q)
-for r in data:
-    print(f"  {r}")
-keys_ok = all(set(r.keys()) == {"date", "index"} for r in data)
-print(f"  Only 'date' & 'index' keys? {keys_ok}")
+# ── 4. Search by title/id ──────────────────────────────────────────
+print("=== 4. Search for 'fuel' ===")
+fuel = [d for d in all_ds if "fuel" in d["id"].lower() or "fuel" in d["title_en"].lower()]
+for d in fuel:
+    print(f"  {d['id']:40s} {d['title_en']}")
 print()
 
-# ── Test 5: Date range ─────────────────────────────────────────────
-print("=== TEST 5: QueryBuilder - Date Range ===")
-q = QueryBuilder().date_range("date", start="2023-01-01", end="2023-12-31").limit(10)
-data = client.opendosm.cpi(query=q)
-print(f"CPI records in 2023: {len(data)}")
-for r in data[:3]:
-    print(f"  date={r.get('date')}, index={r.get('index')}")
+print("=== 5. Search for 'gdp' ===")
+gdp = [d for d in all_ds if "gdp" in d["id"].lower() or "gdp" in d["title_en"].lower()]
+for d in gdp:
+    print(f"  {d['id']:40s} {d['title_en']}")
 print()
 
-# ── Test 6: Metadata response ─────────────────────────────────────
-print("=== TEST 6: Metadata Response ===")
-data = client.opendosm.get("cpi_core", meta=True, limit=5)
-print(f"  Type: {type(data).__name__}")
-is_api_response = isinstance(data, APIResponse)
-print(f"  Is APIResponse? {is_api_response}")
-if is_api_response:
-    print(f"  Meta: {data.meta}")
-    print(f"  Data count: {len(data.data)}")
+print("=== 6. Search for 'trade' ===")
+trade = [d for d in all_ds if "trade" in d["id"].lower() or "trade" in d["title_en"].lower()]
+for d in trade:
+    print(f"  {d['id']:40s} {d['title_en']}")
 print()
 
-# ── Test 7: Data Catalogue API ─────────────────────────────────────
-print("=== TEST 7: Data Catalogue API ===")
-cat_data = client.data_catalogue.get("fuelprice", limit=5)
-print(f"Fuel price records: {len(cat_data)}")
-print(f"First record: {cat_data[0]}")
+# ── 7. Verify some discovered IDs actually work ────────────────────
+print("=== 7. Verify Discovered IDs Work ===")
+test_ids = [d["id"] for d in gdp[:3]] + [d["id"] for d in trade[:3]]
+for dataset_id in test_ids:
+    try:
+        data = client.data_catalogue.get(dataset_id, limit=1)
+        print(f"  OK   {dataset_id}")
+    except Exception as e:
+        print(f"  FAIL {dataset_id} -> {type(e).__name__}")
 print()
 
-# ── Test 8: Pandas integration ─────────────────────────────────────
-print("=== TEST 8: Pandas Integration ===")
-try:
-    raw = client.opendosm.cpi(limit=20)
-    df = client.to_dataframe(raw)
-    print(f"  DataFrame shape: {df.shape}")
-    print(f"  Columns: {list(df.columns)}")
-    print(f"  Dtypes:")
-    print(df.dtypes.to_string())
-    print(f"  Head:")
-    print(df.head(3).to_string())
-except ImportError as e:
-    print(f"  SKIP (pandas not installed): {e}")
+# ── 8. Check available sources ─────────────────────────────────────
+print("=== 8. Data Sources ===")
+sources = sorted(set(d["source"] for d in all_ds))
+for s in sources[:15]:
+    count = sum(1 for d in all_ds if d["source"] == s)
+    print(f"  {s:30s} ({count} datasets)")
+if len(sources) > 15:
+    print(f"  ... and {len(sources) - 15} more")
 print()
 
-# ── Test 9: Context manager ───────────────────────────────────────
-print("=== TEST 9: Context Manager ===")
-with OpenDOSM() as ctx_client:
-    data = ctx_client.opendosm.trade(limit=5)
-    print(f"  Trade records: {len(data)}")
-print("  Client closed automatically - OK")
-print()
-
-# ── Test 10: Error handling ────────────────────────────────────────
-print("=== TEST 10: Error Handling ===")
-try:
-    client.opendosm.get("nonexistent_dataset_xyz_123")
-    print("  FAIL - no error raised!")
-except NotFoundError as e:
-    print(f"  Caught expected NotFoundError: {e}")
-except Exception as e:
-    print(f"  Caught unexpected {type(e).__name__}: {e}")
+# ── 9. Check frequencies ──────────────────────────────────────────
+print("=== 9. Update Frequencies ===")
+freqs = sorted(set(d["frequency"] for d in all_ds))
+for f in freqs:
+    count = sum(1 for d in all_ds if d["frequency"] == f)
+    print(f"  {f:20s} ({count} datasets)")
 
 client.close()
-
 print()
-print("=" * 50)
-print("All 10 tests complete!")
+print("All discovery tests complete!")
