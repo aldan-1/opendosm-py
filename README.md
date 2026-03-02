@@ -1,6 +1,6 @@
 # opendosm 🇲🇾
 
-[![CI](https://github.com/aldan-1/opendosm-py/actions/workflows/ci.yml/badge.svg)](https://github.com/aldan-1/opendosm-py/actions)
+[![CI](https://github.com/aldan-1/opendosm-py/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/aldan-1/opendosm-py/actions)
 [![PyPI](https://img.shields.io/pypi/v/opendosm)](https://pypi.org/project/opendosm/)
 [![Python](https://img.shields.io/pypi/pyversions/opendosm)](https://pypi.org/project/opendosm/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
