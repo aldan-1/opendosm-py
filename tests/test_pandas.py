@@ -49,7 +49,7 @@ class TestDatasetInfoConversion:
     """Tests for converting DatasetInfo Pydantic models to DataFrame."""
 
     def test_list_of_dataset_info(self):
-        pd = pytest.importorskip("pandas")
+        pytest.importorskip("pandas")
         datasets = [
             DatasetInfo(
                 id="fuelprice",
@@ -130,7 +130,7 @@ class TestNumericCoercion:
         assert not pd.api.types.is_numeric_dtype(df["col"])
 
     def test_all_none_column(self):
-        pd = pytest.importorskip("pandas")
+        pytest.importorskip("pandas")
         data = [
             {"val": None},
             {"val": None},

@@ -6,7 +6,6 @@ from opendosm.api.data_catalogue import DataCatalogueAPI
 from opendosm.http import HTTPClient
 from opendosm.models import DatasetInfo
 
-
 SAMPLE_DATASETS = [
     {
         "id": "fuelprice",
