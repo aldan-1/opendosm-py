@@ -81,7 +81,7 @@ class QueryBuilder:
                 )
 
         parts: list[str] = []
-        for col, desc in zip(columns, flags):
+        for col, desc in zip(columns, flags):  # noqa: B905 — lengths validated above
             parts.append(f"-{col}" if desc else col)
         self._params["sort"] = ",".join(parts)
         return self

@@ -43,7 +43,7 @@ class TestClientLifecycle:
         # Client is closed after exiting the block
 
     def test_to_dataframe_delegates(self):
-        pd = pytest.importorskip("pandas")
+        pytest.importorskip("pandas")
         client = OpenDOSM()
         data = [{"date": "2023-01-01", "value": 42}]
         df = client.to_dataframe(data)
