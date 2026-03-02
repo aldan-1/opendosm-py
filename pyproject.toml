@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opendosm"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Pythonic SDK for Malaysia's OpenDOSM and data.gov.my Open API"
 readme = "README.md"
 license = {text = "MIT"}
