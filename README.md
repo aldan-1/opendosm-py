@@ -13,7 +13,7 @@ A Pythonic SDK for Malaysia's **[data.gov.my Open API](https://developer.data.go
 - 🗂️ **Dataset discovery** — `list_datasets()` and `search()` to find any of the 280+ available datasets
 - 📊 **Pandas integration** — `.to_dataframe()` with automatic date parsing
 - ⚡ **Smart retries** — automatic exponential backoff on rate limits (429)
-- 🔐 **Token auth** — optional API token for higher rate limits
+- 🔐 **Token auth** — optional API token for authenticated access
 - 🧩 **Typed** — full type hints and Pydantic response models
 - 📦 **Zero config** — works out of the box, no API key required
 

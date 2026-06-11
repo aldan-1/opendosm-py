@@ -50,8 +50,11 @@ class OpenDOSM:
         token: str | None = None,
         base_url: str = "https://api.data.gov.my",
         timeout: float = 30.0,
+        max_retries: int = 3,
     ) -> None:
-        self._http = HTTPClient(base_url=base_url, token=token, timeout=timeout)
+        self._http = HTTPClient(
+            base_url=base_url, token=token, timeout=timeout, max_retries=max_retries
+        )
 
         # Sub-clients for each API family
         self.opendosm = OpenDOSMAPI(self._http)

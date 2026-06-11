@@ -8,6 +8,7 @@ from typing import Any
 
 import httpx
 
+from opendosm._version import __version__
 from opendosm.exceptions import (
     APIError,
     AuthenticationError,
@@ -45,7 +46,7 @@ class HTTPClient:
 
         headers: dict[str, str] = {
             "Accept": "application/json",
-            "User-Agent": "opendosm-py/0.1.0",
+            "User-Agent": f"opendosm-py/{__version__}",
         }
         if token:
             headers["Authorization"] = f"Token {token}"

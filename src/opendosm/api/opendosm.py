@@ -7,9 +7,53 @@ from typing import TYPE_CHECKING, Any
 from opendosm.api.base import BaseAPI
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from opendosm.http import HTTPClient
     from opendosm.models import APIResponse
     from opendosm.query import QueryBuilder
+
+
+# ── Registry of convenience dataset aliases ────────────────────────
+# Each entry creates a method on OpenDOSMAPI with the given default ID.
+
+_CONVENIENCE_DATASETS: dict[str, str] = {
+    "cpi": "cpi_core",
+    "gdp": "gdp_qtr_real",
+    "population": "population_state",
+    "trade": "trade_sitc_1d",
+    "labour": "lfs_month",
+}
+
+
+def _make_convenience_method(default_id: str) -> Callable[..., Any]:
+    """Build a convenience method that fetches *default_id* by default."""
+    # Build a docstring once so it's attached to the generated method.
+    _doc = (
+        f"Fetch {default_id} data.\n\n"
+        f"Args:\n"
+        f"    dataset_id: Dataset identifier (default ``{default_id}``).\n"
+        f"    query: Optional ``QueryBuilder`` with filters, sorting, limits.\n"
+        f"    meta: If ``True``, returns an ``APIResponse`` with metadata.\n"
+        f"    **extra_params: Additional raw query parameters.\n"
+    )
+
+    def method(
+        self: OpenDOSMAPI,
+        dataset_id: str = default_id,
+        query: QueryBuilder | None = None,
+        *,
+        meta: bool = False,
+        **extra_params: str,
+    ) -> list[dict[str, Any]] | APIResponse:
+        """Fetch data. See ``_CONVENIENCE_DATASETS`` for default IDs."""
+        return self._get(dataset_id, query, meta=meta, **extra_params)
+
+    method.__doc__ = _doc
+    return method
+
+
+# ── API class ──────────────────────────────────────────────────────
 
 
 class OpenDOSMAPI(BaseAPI):
@@ -53,90 +97,7 @@ class OpenDOSMAPI(BaseAPI):
         """
         return self._get(dataset_id, query, meta=meta, **extra_params)
 
-    # ── Convenience helpers for popular datasets ───────────────────────
 
-    def cpi(
-        self,
-        dataset_id: str = "cpi_core",
-        query: QueryBuilder | None = None,
-        *,
-        meta: bool = False,
-        **extra_params: str,
-    ) -> list[dict[str, Any]] | APIResponse:
-        """Fetch Consumer Price Index data.
-
-        Args:
-            dataset_id: CPI dataset variant (default ``"cpi_core"``).
-            query: Optional filters.
-            meta: If ``True``, returns an ``APIResponse`` with metadata.
-        """
-        return self._get(dataset_id, query, meta=meta, **extra_params)
-
-    def gdp(
-        self,
-        dataset_id: str = "gdp_qtr_real",
-        query: QueryBuilder | None = None,
-        *,
-        meta: bool = False,
-        **extra_params: str,
-    ) -> list[dict[str, Any]] | APIResponse:
-        """Fetch Gross Domestic Product data.
-
-        Args:
-            dataset_id: GDP dataset variant (default ``"gdp_qtr_real"``).
-                Other variants: ``"gdp_qtr_nominal"``.
-            query: Optional filters.
-            meta: If ``True``, returns an ``APIResponse`` with metadata.
-        """
-        return self._get(dataset_id, query, meta=meta, **extra_params)
-
-    def population(
-        self,
-        dataset_id: str = "population_state",
-        query: QueryBuilder | None = None,
-        *,
-        meta: bool = False,
-        **extra_params: str,
-    ) -> list[dict[str, Any]] | APIResponse:
-        """Fetch population data.
-
-        Args:
-            dataset_id: Population dataset variant (default ``"population_state"``).
-            query: Optional filters.
-            meta: If ``True``, returns an ``APIResponse`` with metadata.
-        """
-        return self._get(dataset_id, query, meta=meta, **extra_params)
-
-    def trade(
-        self,
-        dataset_id: str = "trade_sitc_1d",
-        query: QueryBuilder | None = None,
-        *,
-        meta: bool = False,
-        **extra_params: str,
-    ) -> list[dict[str, Any]] | APIResponse:
-        """Fetch external trade data.
-
-        Args:
-            dataset_id: Trade dataset variant (default ``"trade_sitc_1d"``).
-            query: Optional filters.
-            meta: If ``True``, returns an ``APIResponse`` with metadata.
-        """
-        return self._get(dataset_id, query, meta=meta, **extra_params)
-
-    def labour(
-        self,
-        dataset_id: str = "lfs_month",
-        query: QueryBuilder | None = None,
-        *,
-        meta: bool = False,
-        **extra_params: str,
-    ) -> list[dict[str, Any]] | APIResponse:
-        """Fetch labour force survey data.
-
-        Args:
-            dataset_id: Labour dataset variant (default ``"lfs_month"``).
-            query: Optional filters.
-            meta: If ``True``, returns an ``APIResponse`` with metadata.
-        """
-        return self._get(dataset_id, query, meta=meta, **extra_params)
+# Dynamically attach convenience methods from the registry.
+for _name, _default_id in _CONVENIENCE_DATASETS.items():
+    setattr(OpenDOSMAPI, _name, _make_convenience_method(_default_id))

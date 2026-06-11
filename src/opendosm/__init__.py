@@ -11,6 +11,7 @@ Quick start::
 
 from __future__ import annotations
 
+from opendosm._version import __version__
 from opendosm.client import OpenDOSM
 from opendosm.exceptions import (
     APIError,
@@ -22,8 +23,6 @@ from opendosm.exceptions import (
 )
 from opendosm.models import APIResponse, DatasetInfo, MetaInfo
 from opendosm.query import QueryBuilder
-
-__version__ = "0.1.1"
 
 __all__ = [
     "OpenDOSM",
