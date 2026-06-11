@@ -23,7 +23,7 @@ from opendosm.exceptions import (
 from opendosm.models import APIResponse, DatasetInfo, MetaInfo
 from opendosm.query import QueryBuilder
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "OpenDOSM",
