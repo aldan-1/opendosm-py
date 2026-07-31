@@ -36,8 +36,7 @@
   │  ← imported   │   │ .opendosm ────┼───▶│   │  ├─AuthError     │
   │    by http.py │   │ .data_catalogue┼───▶│   │  └─NotFoundError │
   │    & init.py  │   │ .to_dataframe()│    │   └─InvalidQueryError│
-  └───────────────┘   │ .to_sql() [TBD]│    └───────────────────────┘
-                      │ .close()       │
+  └───────────────┘   │ .close()       │    └───────────────────────┘
                       │ __enter/exit__ │
                       └───┬───────┬───┘
                           │       │
@@ -105,7 +104,7 @@
   │  │     │                                                          │    │
   │  │     ├── 200 → return response.json()                           │    │
   │  │     ├── 429 → retry with exponential backoff + Retry-After     │    │
-  │  │     │         backoff: 1s → 2s → 4s (× max_retries)           │    │
+  │  │     │         backoff: 1s → 2s → 4s (x max_retries)           │    │
   │  │     │         exhausted → raise RateLimitError(retry_after)    │    │
   │  │     ├── 401/403 → raise AuthenticationError                    │    │
   │  │     ├── 404     → raise NotFoundError                          │    │
@@ -229,7 +228,7 @@
   │  Steps:                 │          │                              │
   │    pip install -e .[dev]│          │  Trigger:                    │
   │    ruff check           │          │    gh release create vX.Y.Z  │
-  │    mypy --strict        │          │    → auto-builds + uploads   │
+  │    mypy --strict        │          │    -> auto-builds + uploads  │
   │    pytest --cov         │          └──────────────────────────────┘
   └─────────────────────────┘
 
@@ -254,7 +253,7 @@
       │              ├── httpx.Client → api.data.gov.my
       │              │       │
       │              │       ├── 200 → response.json()
-      │              │       ├── 429 → retry (×3, backoff 1s→2s→4s)
+      │              │       ├── 429 → retry (x3, backoff 1s→2s→4s)
       │              │       └── 4xx/5xx → raise typed exception
       │              │
       │              └── returns: list[dict] or APIResponse
