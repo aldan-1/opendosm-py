@@ -18,7 +18,7 @@ PASSED = 0
 FAILED = 0
 
 
-def test(name, func):
+def run_test(name, func):
     """Run a test and report pass/fail."""
     global PASSED, FAILED
     print(f"\n{'='*60}")
@@ -333,21 +333,21 @@ if __name__ == "__main__":
     print(f"Python {sys.version}")
     print("=" * 60)
 
-    test("1. Import all public exports", test_import)
-    test("2. Client initialization", test_client_init)
-    test("3. Context manager", test_context_manager)
-    test("4. Fetch CPI data (live API)", test_fetch_cpi)
-    test("5. QueryBuilder (limit + sort)", test_query_builder)
-    test("6. Meta response", test_meta_response)
-    test("7. GDP convenience method", test_gdp)
-    test("8. Data Catalogue (fuel price)", test_data_catalogue)
-    test("9. List all datasets", test_list_datasets)
-    test("10. Filter datasets by category", test_list_datasets_filtered)
-    test("11. Search datasets", test_search_datasets)
-    test("12. Pandas DataFrame conversion", test_pandas_dataframe)
-    test("13. DatasetInfo to DataFrame", test_dataset_info_to_dataframe)
-    test("14. NotFoundError handling", test_not_found_error)
-    test("15. InvalidQueryError handling", test_invalid_query)
+    run_test("1. Import all public exports", test_import)
+    run_test("2. Client initialization", test_client_init)
+    run_test("3. Context manager", test_context_manager)
+    run_test("4. Fetch CPI data (live API)", test_fetch_cpi)
+    run_test("5. QueryBuilder (limit + sort)", test_query_builder)
+    run_test("6. Meta response", test_meta_response)
+    run_test("7. GDP convenience method", test_gdp)
+    run_test("8. Data Catalogue (fuel price)", test_data_catalogue)
+    run_test("9. List all datasets", test_list_datasets)
+    run_test("10. Filter datasets by category", test_list_datasets_filtered)
+    run_test("11. Search datasets", test_search_datasets)
+    run_test("12. Pandas DataFrame conversion", test_pandas_dataframe)
+    run_test("13. DatasetInfo to DataFrame", test_dataset_info_to_dataframe)
+    run_test("14. NotFoundError handling", test_not_found_error)
+    run_test("15. InvalidQueryError handling", test_invalid_query)
 
     print(f"\n{'='*60}")
     print(f"RESULTS: {PASSED} passed, {FAILED} failed, {PASSED + FAILED} total")
