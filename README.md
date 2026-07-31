@@ -59,6 +59,13 @@ with OpenDOSM() as client:
 client = OpenDOSM(token="your-api-token")
 ```
 
+### Configuring Retries
+
+```python
+# Default is 3 retries with exponential backoff on rate limits (429)
+client = OpenDOSM(max_retries=5)  # Increase for bulk operations
+```
+
 ## Filtering & Queries
 
 Use the fluent `QueryBuilder` to construct queries:
@@ -170,8 +177,15 @@ except RateLimitError:
 # Clone and install in dev mode
 git clone https://github.com/aldan-1/opendosm-py.git
 cd opendosm-py
+
+# Using pip
 pip install -e ".[dev]"
 
+# Or using uv (faster, reproducible via uv.lock)
+uv sync --group dev
+```
+
+```bash
 # Run tests
 pytest tests/ -v
 
@@ -179,7 +193,7 @@ pytest tests/ -v
 ruff check src/ tests/
 
 # Type check
-mypy src/opendosm/
+mypy src/opendosm/ --ignore-missing-imports
 ```
 
 ## License
@@ -191,3 +205,4 @@ MIT — see [LICENSE](LICENSE).
 - **API Docs**: [developer.data.gov.my](https://developer.data.gov.my/)
 - **OpenDOSM Portal**: [open.dosm.gov.my](https://open.dosm.gov.my/)
 - **Dataset Catalogue**: [data.gov.my/data-catalogue](https://data.gov.my/data-catalogue)
+- **Project Docs**: [`docs/`](docs/) — architecture, roadmap, API coverage
