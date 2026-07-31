@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opendosm"
-version = "0.1.1"
+dynamic = ["version"]
 description = "A Pythonic SDK for Malaysia's OpenDOSM and data.gov.my Open API"
 readme = "README.md"
 license = {text = "MIT"}
@@ -42,6 +42,7 @@ dev = [
     "mypy>=1.0.0",
     "pandas>=1.5.0",
     "pandas-stubs>=1.5.0",
+    "numpy>=1.24,<2.5",
 ]
 
 [project.urls]
@@ -54,6 +55,9 @@ Changelog = "https://github.com/aldan-1/opendosm-py/blob/main/CHANGELOG.md"
 [tool.hatch.build.targets.wheel]
 packages = ["src/opendosm"]
 
+[tool.hatch.version]
+path = "src/opendosm/_version.py"
+
 [tool.ruff]
 target-version = "py310"
 line-length = 100
@@ -64,6 +68,15 @@ select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "TCH"]
 [tool.mypy]
 python_version = "3.10"
 strict = true
+
+# Third-party stubs (numpy/pandas) use syntax newer than our target
+# (e.g. the `type` statement) which mypy chokes on while parsing with
+# python_version=3.10. Syntax errors can't be suppressed via
+# ignore_errors, so skip following these imports entirely — they become
+# Any, and our own source stays fully type-checked.
+[[tool.mypy.overrides]]
+module = ["numpy.*", "pandas.*"]
+follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
