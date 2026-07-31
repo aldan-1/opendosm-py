@@ -32,3 +32,6 @@ Thumbs.db
 
 # Personal development notes
 knowledge base/
+
+# Nested duplicate clone (accidental, has own .git)
+opendosm-py/
