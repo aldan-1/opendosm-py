@@ -26,7 +26,7 @@ def test(name, func):
     print(f"{'='*60}")
     try:
         func()
-        print(f"PASSED")
+        print("PASSED")
         PASSED += 1
     except Exception as e:
         print(f"FAILED: {e}")
@@ -42,21 +42,10 @@ def test_import():
     Expected: All public classes import without error.
     """
     from opendosm import (
-        OpenDOSM,
-        QueryBuilder,
-        APIResponse,
-        DatasetInfo,
-        MetaInfo,
-        OpenDOSMError,
-        APIError,
-        RateLimitError,
-        NotFoundError,
-        AuthenticationError,
-        InvalidQueryError,
         __version__,
     )
     print(f"  Version: {__version__}")
-    print(f"  All 12 public exports imported successfully")
+    print("  All 12 public exports imported successfully")
     assert __version__, "Version should not be empty"
 
 
@@ -75,7 +64,7 @@ def test_client_init():
     assert hasattr(client, "to_dataframe"), "Missing .to_dataframe()"
     print(f"  repr: {client!r}")
     client.close()
-    print(f"  Client created and closed successfully")
+    print("  Client created and closed successfully")
 
 
 # ── TEST 3: Context Manager ──────────────────────────────────
@@ -89,7 +78,7 @@ def test_context_manager():
 
     with OpenDOSM() as client:
         print(f"  Inside context manager: {client!r}")
-    print(f"  Exited context manager - client auto-closed")
+    print("  Exited context manager - client auto-closed")
 
 
 # ── TEST 4: Fetch CPI Data (Live API) ────────────────────────
@@ -142,7 +131,7 @@ def test_meta_response():
     Condition: Use meta=True to get total count.
     Expected: Returns APIResponse with .meta and .data attributes.
     """
-    from opendosm import OpenDOSM, QueryBuilder, APIResponse
+    from opendosm import APIResponse, OpenDOSM, QueryBuilder
 
     with OpenDOSM() as client:
         query = QueryBuilder().limit(3)
@@ -195,14 +184,14 @@ def test_list_datasets():
     Condition: Call list_datasets() with no filters.
     Expected: Returns 200+ DatasetInfo objects.
     """
-    from opendosm import OpenDOSM, DatasetInfo
+    from opendosm import DatasetInfo, OpenDOSM
 
     with OpenDOSM() as client:
         datasets = client.data_catalogue.list_datasets()
         assert len(datasets) > 100, f"Expected 100+ datasets, got {len(datasets)}"
         assert all(isinstance(d, DatasetInfo) for d in datasets[:5])
         print(f"  Total datasets: {len(datasets)}")
-        print(f"  First 5:")
+        print("  First 5:")
         for ds in datasets[:5]:
             print(f"    - {ds.id}: {ds.title_en}")
 
@@ -308,12 +297,12 @@ def test_not_found_error():
     Condition: get("totally_fake_dataset_xyz").
     Expected: Raises NotFoundError.
     """
-    from opendosm import OpenDOSM, NotFoundError
+    from opendosm import NotFoundError, OpenDOSM
 
     with OpenDOSM() as client:
         try:
             client.opendosm.get("totally_fake_dataset_xyz")
-            assert False, "Should have raised NotFoundError"
+            raise AssertionError("Should have raised NotFoundError")
         except NotFoundError as e:
             print(f"  Correctly raised NotFoundError: {e}")
             assert e.status_code == 404
@@ -326,11 +315,11 @@ def test_invalid_query():
     Condition: QueryBuilder().limit(-1).
     Expected: Raises InvalidQueryError immediately (client-side validation).
     """
-    from opendosm import QueryBuilder, InvalidQueryError
+    from opendosm import InvalidQueryError, QueryBuilder
 
     try:
         QueryBuilder().limit(-1)
-        assert False, "Should have raised InvalidQueryError"
+        raise AssertionError("Should have raised InvalidQueryError")
     except InvalidQueryError as e:
         print(f"  Correctly raised InvalidQueryError: {e}")
 
