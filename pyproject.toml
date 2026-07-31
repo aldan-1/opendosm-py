@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opendosm"
-version = "0.1.2"
+dynamic = ["version"]
 description = "A Pythonic SDK for Malaysia's OpenDOSM and data.gov.my Open API"
 readme = "README.md"
 license = {text = "MIT"}
@@ -42,6 +42,7 @@ dev = [
     "mypy>=1.0.0",
     "pandas>=1.5.0",
     "pandas-stubs>=1.5.0",
+    "numpy>=1.24,<2.5",
 ]
 
 [project.urls]
@@ -53,6 +54,9 @@ Changelog = "https://github.com/aldan-1/opendosm-py/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/opendosm"]
+
+[tool.hatch.version]
+path = "src/opendosm/_version.py"
 
 [tool.ruff]
 target-version = "py310"
