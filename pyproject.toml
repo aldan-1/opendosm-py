@@ -65,12 +65,14 @@ select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "TCH"]
 python_version = "3.10"
 strict = true
 
-# Third-party stubs (numpy/pandas) use syntax newer than our target and
-# are not our code — ignore errors inside them while still following
-# imports for type information.
+# Third-party stubs (numpy/pandas) use syntax newer than our target
+# (e.g. the `type` statement) which mypy chokes on while parsing with
+# python_version=3.10. Syntax errors can't be suppressed via
+# ignore_errors, so skip following these imports entirely — they become
+# Any, and our own source stays fully type-checked.
 [[tool.mypy.overrides]]
 module = ["numpy.*", "pandas.*"]
-ignore_errors = true
+follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
